@@ -1,0 +1,177 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    <h2>Welcome to my page</h2>
+    <p>This is the home page</p>
+
+    <h2>Recent Posts</h2>
+    {% if posts %}
+        {% for post in posts %}
+            <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 15px">
+                <h3>{{ post.title }}</h3>
+                
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}" width="70%" style="display:flex; border: 1px solid #ccc; align-items: center; margin-top: 10px; margin-bottom: 10px;"/>
+                {% endif %}
+                
+                <small>By {{ post.author }} on {{ post.date_created }}</small>
+                
+                <p>{{ post.content|truncatewords:50 }}</p>
+                <a href="{% url 'post_detail' post.id %}">Read More</a>
+                <p>
+                    Category:
+                    {% if post.category %}
+                        <a href="{% url 'posts_by_category' post.category.id %}">{{ post.category.name }}</a>
+                    {% else %}
+                        No Category
+                    {% endif %}
+                </p>
+                
+                <p>
+                    Tags: 
+                    {% for tag in post.tags.all %}
+                        <a href="{% url 'posts_by_tag' tag.id %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        No Tags
+                    {% endfor %}
+                </p>
+                {% if user.is_authenticated %}
+                <br />
+                <a href="{% url 'delete_post' post.id %}" style="color: rgb(22, 16, 16); text-decoration: none; padding: 5px; background: none; border: 1px solid #ccc; padding: 10px 20px; margin-bottom: 10px;">Delete Post</a>
+                <button class="delete-btn" data-id="{{ post.id }}">Delete with Ajax</button>
+
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script>
+                    $(document).ready(function(){
+                        $('.delete-btn').click(function(){
+                            const postId = $(this).data('id');
+                            if(confirm('Are you sure you want to delete this post?')){
+                                $.ajax({
+                                    url: '{% url "ajax_delete_post" %}',
+                                    type: 'POST',
+                                    data: {
+                                        'post_id': postId,
+                                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                    },
+                                    success: function(response){
+                                        if(response.status == 'success'){
+                                            //location.reload();
+                                            if (!localStorage.getItem('reloaded')) {
+                                            localStorage.setItem('reloaded', 'true');
+                                            location.reload();
+                                            } else {
+                                                    localStorage.removeItem('reloaded');
+                                            }
+                                        } else {
+                                            alert('You are not allowed to delete this post.');
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    });
+                </script>
+                <!-- popup edit -->
+                <!-- Edit Button -->
+                <button class="edit-btn" data-id="{{ post.id }}" data-title="{{ post.title }}" data-content="{{ post.content }}">
+                    Edit with Ajax
+                </button>
+
+                <!-- Bootstrap Edit Modal -->
+                <div class="modal fade" id="editPostModal" tabindex="-1" aria-labelledby="editPostLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    <form id="editPostForm">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                        <h5 class="modal-title">Edit Post</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                        <input type="hidden" id="editPostId" name="post_id">
+                        <div>
+                            <label>Title:</label>
+                            <input type="text" id="editPostTitle" name="title" class="form-control">
+                        </div>
+                        <div>
+                            <label>Content:</label>
+                            <textarea id="editPostContent" name="content" class="form-control"></textarea>
+                        </div>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+                </div>
+                <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+                <script>
+                $(document).ready(function(){
+                    // Open Modal with existing post data
+                    $('.edit-btn').click(function(){
+                        const postId = $(this).data('id');
+                        const title = $(this).data('title');
+                        const content = $(this).data('content');
+                        
+                        $('#editPostId').val(postId);
+                        $('#editPostTitle').val(title);
+                        $('#editPostContent').val(content);
+                        
+                        $('#editPostModal').modal('show');
+                    });
+
+                    // AJAX submit for editing post
+                    $('#editPostForm').submit(function(e){
+                        e.preventDefault();
+                        $.ajax({
+                            url: '{% url "ajax_edit_post" %}',
+                            type: 'POST',
+                            data: {
+                                'post_id': $('#editPostId').val(),
+                                'title': $('#editPostTitle').val(),
+                                'content': $('#editPostContent').val(),
+                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                            },
+                            success: function(response){
+                                if(response.status == 'success'){
+                                    alert('Post updated!');
+                                    //location.reload();
+                                    if (!localStorage.getItem('reloaded')) {
+                                            localStorage.setItem('reloaded', 'true');
+                                            location.reload();
+                                    } else {
+                                            localStorage.removeItem('reloaded');
+                                    }
+
+                                } else {
+                                    alert('Edit failed or forbidden.');
+                                }
+                            }
+                        });
+                    });
+                });
+                </script>
+
+                {% endif %}
+            </div>
+        {% endfor %}
+            <div>
+                {% if posts.has_previous %}
+                    <a href="?page=1">First</a>
+                    <a href="?page={{ posts.previous_page_number }}">Previous</a>
+                {% endif %}
+
+                Page {{ posts.number }} of {{ posts.paginator.num_pages }}
+
+                {% if posts.has_next %}
+                    <a href="?page={{ posts.next_page_number }}">Next</a>
+                    <a href="?page={{ posts.paginator.num_pages }}">Last</a>
+                {% endif %}
+            </div>
+
+    {% else %}
+        <p>No posts are available.</p>
+    {% endif %}
+{% endblock %}

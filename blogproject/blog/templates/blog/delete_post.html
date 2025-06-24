@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Delete Post</title>
+  </head>
+  <body>
+    <section
+      style="padding: 150px; text-align: center; background-color: #f2f2f2"
+    >
+      <h2 style="padding-bottom: 50px">
+        Are you sure you want to delete
+        <span style="background-color: yellowgreen; color: #333; padding: 5px"
+          >"{{ post.title }}"</span
+        >?
+      </h2>
+      <form method="post">
+        {% csrf_token %}
+        <button
+          type="submit"
+          style="
+            color: #fff;
+            background-color: red;
+            padding: 10px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+          "
+        >
+          Yes, Delete
+        </button>
+        <a
+          href="{% url 'home' %}"
+          style="
+            color: #fff;
+            background-color: seagreen;
+            padding: 10px;
+            text-decoration: none;
+          "
+          >Cancel</a
+        >
+      </form>
+    </section>
+  </body>
+</html>
