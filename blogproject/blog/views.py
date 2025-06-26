@@ -11,12 +11,14 @@ from django.http import JsonResponse
 #import pop edit
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-
+from django.http import HttpResponseForbidden
 
 def home(request):
     posts = Post.objects.all().order_by('-date_created')
+    paginator = Paginator(posts, 5)  # 5 posts per page
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
     return render(request, 'blog/index.html', {'posts': posts})
-
 
 
 def register_view(request):
@@ -66,14 +68,13 @@ def create_post(request):
         form = PostForm()
     return render(request, 'blog/create_post.html', {'form': form})
 
-
+@login_required
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
         post.delete()
         return redirect('home')  # After deletion, go to index page
     return render(request, 'blog/delete_post.html', {'post': post})
-
 
 
 def posts_by_category(request, category_id):
@@ -90,13 +91,11 @@ def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     return render(request, 'blog/post_detail.html', {'post': post})
 
-def index(request):
-    post_list = Post.objects.all().order_by('-date_created')
-    paginator = Paginator(post_list, 5)  # 5 posts per page
-    page_number = request.GET.get('page')
-    posts = paginator.get_page(page_number)
-    return render(request, 'index.html', {'posts': posts})
+#def home(request):
+#    post_list = Post.objects.all().order_by('-date_created')
+    
 
+@login_required
 def ajax_delete_post(request):
     if request.method == 'POST':
         post_id = request.POST.get('post_id')
@@ -125,6 +124,32 @@ def ajax_edit_post(request):
             return JsonResponse({'status': 'forbidden'})
     return JsonResponse({'status': 'error'})
 
+@login_required
+def edit_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
 
+    if post.author != request.user:
+        return HttpResponseForbidden("You don't have permission to edit this post.")
+    
+    if request.method == "POST":
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('post_detail', post_id=post.id)
+        
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/create_post.html', {'form':form, 'edit':True})
 
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
 
+    if post.author != request.user:
+        return HttpResponseForbidden("You don't have permission to delete this post.")
+    
+    else:
+        if request.method == 'POST':
+            post.delete()
+            return redirect('home')
+    return render(request, 'blog/post_confirm_delete.html', {'post': post})

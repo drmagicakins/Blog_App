@@ -11,17 +11,18 @@
                 <h3>{{ post.title }}</h3>
                 
                 {% if post.image %}
-                    <img src="{{ post.image.url }}" alt="{{ post.title }}" width="70%" style="display:flex; border: 1px solid #ccc; align-items: center; margin-top: 10px; margin-bottom: 10px;"/>
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}" width="450px" style="display:flex; border: 1px solid #ccc; align-items: center; margin-top: 10px; margin-bottom: 10px;"/>
                 {% endif %}
                 
                 <small>By {{ post.author }} on {{ post.date_created }}</small>
                 
-                <p>{{ post.content|truncatewords:50 }}</p>
-                <a href="{% url 'post_detail' post.id %}">Read More</a>
+                <p class="post-detail">{{ post.content|truncatewords:50 }}</p>
+                <a href="{% url 'post_detail' post.id %}" class="read-more">Read More</a>
+                <div class="tag-and-category">
                 <p>
                     Category:
                     {% if post.category %}
-                        <a href="{% url 'posts_by_category' post.category.id %}">{{ post.category.name }}</a>
+                        <a href="{% url 'posts_by_category' post.category.id %}"><span>{{ post.category.name }}</span></a>
                     {% else %}
                         No Category
                     {% endif %}
@@ -30,14 +31,15 @@
                 <p>
                     Tags: 
                     {% for tag in post.tags.all %}
-                        <a href="{% url 'posts_by_tag' tag.id %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+                        <a href="{% url 'posts_by_tag' tag.id %}"><span>{{ tag.name }}</span></a>{% if not forloop.last %}, {% endif %}
                     {% empty %}
                         No Tags
                     {% endfor %}
                 </p>
+                </div>
                 {% if user.is_authenticated %}
                 <br />
-                <a href="{% url 'delete_post' post.id %}" style="color: rgb(22, 16, 16); text-decoration: none; padding: 5px; background: none; border: 1px solid #ccc; padding: 10px 20px; margin-bottom: 10px;">Delete Post</a>
+                <a href="{% url 'delete_post' post.id %}" style="color: #fff; text-decoration: none; padding: 5px; background: none; border: 1px solid #ccc; padding: 10px 20px; margin-bottom: 10px; background-color:red;">Delete Post</a>
                 <button class="delete-btn" data-id="{{ post.id }}">Delete with Ajax</button>
 
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -157,7 +159,7 @@
                 {% endif %}
             </div>
         {% endfor %}
-            <div>
+            <div class="paginator">
                 {% if posts.has_previous %}
                     <a href="?page=1">First</a>
                     <a href="?page={{ posts.previous_page_number }}">Previous</a>

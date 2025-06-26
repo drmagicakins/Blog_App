@@ -2,7 +2,7 @@
 
 {% block content %}
     {% if category %}
-        <h2>Searched by Category: <span>{{ category.name }}</span></h2>
+        <h2>Searched by Category name: <span>{{ category.name }}</span></h2>
     {% endif %}
 
     {% if posts %}
@@ -11,11 +11,12 @@
                 <h3>{{ post.title }}</h3>
                 
                 {% if post.image %}
-                    <img src="{{ post.image.url }}" alt="{{ post.title }}" width="300" />
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}" width="300" style="display:flex; border: 1px solid #ccc; align-items: center; margin-top: 10px; margin-bottom: 10px;"/>
                 {% endif %}
                 
                 <small>By {{ post.author }} on {{ post.date_created }}</small>
-                <p>{{ post.content|truncatewords:30 }}</p>
+                <p class="post-detail">{{ post.content|truncatewords:30 }}</p>
+                <a href="{% url 'post_detail' post.id %}" class="read-more">Read More</a>
             </div>
         {% endfor %}
     {% else %}

@@ -15,6 +15,8 @@ urlpatterns = [
     path('post/<int:post_id>/', views.post_detail, name='post_detail'),
     path('ajax/delete_post/', views.ajax_delete_post, name='ajax_delete_post'),
     path('ajax/edit_post/', views.ajax_edit_post, name='ajax_edit_post'),
+    path('post/<int:post_id>/edit/', views.edit_post, name='edit_post'),
+    path('post/<int:post_id>/delete/', views.delete_post, name='delete_post'),
 
 ]
 
