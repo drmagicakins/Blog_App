@@ -141,15 +141,15 @@ def edit_post(request, post_id):
         form = PostForm(instance=post)
     return render(request, 'blog/create_post.html', {'form':form, 'edit':True})
 
-@login_required
-def delete_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
+# @login_required
+# def delete_post(request, post_id):
+#     post = get_object_or_404(Post, id=post_id)
 
-    if post.author != request.user:
-        return HttpResponseForbidden("You don't have permission to delete this post.")
+#     if post.author != request.user:
+#         return HttpResponseForbidden("You don't have permission to delete this post.")
     
-    else:
-        if request.method == 'POST':
-            post.delete()
-            return redirect('home')
-    return render(request, 'blog/post_confirm_delete.html', {'post': post})
+#     else:
+#         if request.method == 'POST':
+#             post.delete()
+#             return redirect('home')
+#     return render(request, 'blog/post_confirm_delete.html', {'post': post})

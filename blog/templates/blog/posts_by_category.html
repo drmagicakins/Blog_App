@@ -9,12 +9,12 @@
         {% for post in posts %}
             <div class="post-content">                
                 <h3>{{ post.title }}</h3>
-                
+                <small>By {{ post.author }} on {{ post.date_created }}</small>
+
                 {% if post.image %}
                     <img src="{{ post.image.url }}" alt="{{ post.title }}" width="300" style="display:flex; border: 1px solid #ccc; align-items: center; margin-top: 10px; margin-bottom: 10px;"/>
                 {% endif %}
                 
-                <small>By {{ post.author }} on {{ post.date_created }}</small>
                 <p class="post-detail">{{ post.content|truncatewords:30 }}</p>
                 <a href="{% url 'post_detail' post.id %}" class="read-more">Read More</a>
             </div>

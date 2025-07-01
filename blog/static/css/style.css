@@ -14,6 +14,12 @@ body {
     padding-left:10px;
     padding-right:10px;
   }
+  .logout{
+    background-color: orange;
+    color: #fff;
+    padding: 20px;
+    margin-left: 0px;
+  }
 }
 
 header {
@@ -28,7 +34,7 @@ header {
 nav {
   background-color: #4caf50;
   padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 0px;
 }
 
 nav a {
@@ -39,7 +45,10 @@ nav a {
 }
 
 nav a:hover {
-  text-decoration: underline;
+  text-decoration: none;
+  color:lightgreen;
+  transition: 2s transition all;
+  text-shadow: 2px 2px 25px #333;
 }
 
 hr {
@@ -175,4 +184,38 @@ span {
 
 .paginator a:hover{
   background-color: orange;
+}
+
+.read-more{
+  text-decoration: none;
+  background-color: lightgreen;
+  padding: 10px 20px;
+}
+
+.logout{
+  background-color: orange;
+  color: #fff;
+  padding: 20px;
+  margin-left: 960px;
+}
+
+input{
+  border: 1px solid #333;
+  border-radius:5px 5px;
+  width: 100%;
+}
+input:hover{
+  border: 5px solid rgb(87, 126, 255);
+  border-radius:5px 5px;
+  width: 100%;
+}
+
+textarea{
+  border: 1px solid #333;
+  border-radius:5px 5px;
+  width: 100%;
+}
+
+.post-card{
+
 }
